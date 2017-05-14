@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DataService } from './data.service';
+import {Station} from './station';
 declare var google: any;
 @Component({
   selector: 'app-root',
@@ -8,10 +9,10 @@ declare var google: any;
   providers: [DataService]
 })
 export class AppComponent implements OnInit {
-  stations = {};
+  stations:Station[];
   errorMessage: string;
   mode = 'Observable';
-  
+
   constructor(private _dataservice: DataService) {
   }
 
@@ -22,8 +23,10 @@ export class AppComponent implements OnInit {
       zoom: 10
     });
   }
-  getStationList(){
-     console.log("inside getstationlist");
-    this._dataservice.loadStations().subscribe();
+  getStationList() {
+    this._dataservice.loadStations()
+      .subscribe(stations => {
+        this.stations = stations;
+      });
   }
 }

@@ -8,16 +8,14 @@ import 'rxjs/add/operator/map';
 export class DataService {
     constructor(private _http: Http) {
     }
-    loadStations(): Observable<string> {
+    loadStations(){
         return this._http.get('https://gbfs.thehubway.com/gbfs/en/station_information.json',).
             map(this.extractdata).
             catch(this.handleError);
     }
     private extractdata(res: Response) {
         let body = res.json();
-        console.log("inside extarcted");
-        console.log(body.data());
-        return body.data() || {};
+        return body || {};
     }
     private handleError(error: Response | any) {
         let errmsg: string;
