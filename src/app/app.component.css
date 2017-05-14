@@ -1,0 +1,8 @@
+/*Css specific to this component goes here*/
+section #map{
+    margin: 0 auto;
+    width:100%;
+    height:100%;
+    overflow: none !important;
+    position:absolute !important;
+}

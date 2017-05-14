@@ -8,12 +8,13 @@ export class DataService {
     constructor(private _http: Http) {
     }
     loadmap(): Observable<string> {
-        return this._http.get('https://maps.googleapis.com/maps/api/js?key=').
+        return this._http.get('https://maps.googleapis.com/maps/api/js',).
             map(this.extractdata).
             catch(this.handleError);
     }
     private extractdata(res: Response) {
         let body = res.json();
+        console.log(body.data());
         return body.data() || {};
     }
     private handleError(error: Response | any) {
