@@ -11,9 +11,9 @@ var myMap: any;
 })
 export class AppComponent implements OnInit {
   stations: Station[];
-  errorMessage: string;
-  mode = 'Observable';
-
+  stationReports: any;
+  bikes_available: number;
+  docks_available: number;
   constructor(private _dataservice: DataService) {
   }
 
@@ -23,45 +23,69 @@ export class AppComponent implements OnInit {
       scrollwheel: false,
       zoom: 16
     });
+    this.getStationStatusR();
     this.getStationList();
-    // this.createMapMarkers();
   }
+  
   getStationList() {
-    this._dataservice.loadStations()
-      .subscribe(stations => {
-        this.stations = stations;
-       setTimeout(function(){
-
-       },10000);
-        this.createMapMarkers(this.stations);
-      });
+    this._dataservice.getAllStations()
+    .subscribe(stations => {
+      this.stations = stations;
+      this.createMapMarkers(this.stations);
+    });
   }
 
   createMapMarkers(stationList) {
-    var prev_infowindow = false;
     let stationsArray = stationList['data']['stations'];
     for (var _i = 0; _i < stationsArray.length; _i++) {
-      // console.log(myMap);
-      // console.log( stationsArray[_i]['lat']);
+      var station_id = stationsArray['station_id'];
       var marker = new google.maps.Marker({
-        postion: {
+        position: {
           lat: stationsArray[_i]['lat'],
-          lon: stationsArray[_i]['lon'],
+          lng: stationsArray[_i]['lon'],
         },
-        // map: myMap,
+        map: myMap,
         title: stationsArray[_i]['name'],
         visible: true
       });
-      marker.setMap(myMap);
-      // console.log(marker);
-      marker.addListener('click', function () {
-        if (prev_infowindow) {
-          // prev_infowindow.close();
-          alert("hello");
-        }
-        // generate_status(id, map, marker)
-        //infowindow.open(map,marker);
+      marker.addListener('click',function(){
+        this.createStatusWindow(this.station_id, this.marker,this.stationReports);
       });
     }
   }
-}
+
+  getStationStatusR(){
+    this._dataservice.getAllStationStatus()
+    .subscribe(stationReports => {
+      this.stationReports = stationReports
+      // this.createStatusWindow(station_id, marker, stationReports);
+    });
+  }
+
+  createStatusWindow(station_id, marker, stationReports) {
+    var infowindow: any;
+    // this._dataservice.getAllStationStatus()
+    // .subscribe(stationReports => {
+    //   this.stationReports = stationReports
+    //   // this.createStatusWindow(station_id, marker, stationReports);
+    // });
+    let allStationStatus = stationReports['data']['stations'];
+    console.log(allStationStatus['station_id'])
+    //  for(var _j=0;_j < allStationStatus.length; _j++){
+      var statusPair = allStationStatus.filter(function (station) {
+        if (station['station_id'] == station_id) {
+          this.bikes_available = station['num_bikes_available'];
+          this.docks_available = station['num_docks_available'];
+        }
+      });
+      let contentString = '<div id="content">' + '<h3>Current Status</h3>' +
+      '<p>Bikes Available: ' + this.bikes_available + '</p>' + '<p>Docks Available: '
+      + this.docks_available + '</p>' + '</div>';
+      infowindow = new google.maps.InfoWindow({
+        content: contentString
+      });
+      // prev_infowindow = infowindow;
+      infowindow.open(myMap, marker);
+      //  }
+    }
+  }

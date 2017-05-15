@@ -5,6 +5,6 @@ export class Station{
         private lat:number,
         private lon:number,
         private capacity:number,
-        private rentaMethod:string,
+        private rentalMethod:string,
     ){}
 }
