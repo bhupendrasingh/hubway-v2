@@ -14,7 +14,7 @@ export class DataService {
             map(this.extractdata).
             catch(this.handleError);
     }
-    getAllStationStatus():Observable<Station[]>{
+    getAllStationStatus():Observable<StationStatus[]>{
         return this._http.get('https://gbfs.thehubway.com/gbfs/en/station_status.json').
             map((res:Response)=>res.json() || {}).
             catch(this.handleError);
