@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DataService } from './data.service';
 import { Station } from './station';
+import 'rxjs/add/operator/mergeMap';
 declare var google: any;
 var myMap: any;
 @Component({
@@ -23,7 +24,7 @@ export class AppComponent implements OnInit {
       scrollwheel: false,
       zoom: 16
     });
-    this.getStationStatusR();
+    // this.getStationStatusR();
     this.getStationList();
   }
   
@@ -31,7 +32,12 @@ export class AppComponent implements OnInit {
     this._dataservice.getAllStations()
     .subscribe(stations => {
       this.stations = stations;
-      this.createMapMarkers(this.stations);
+      // this.createMapMarkers(this.stations);
+      this._dataservice.getAllStationStatus()
+      .subsribe(stationReports=>{
+        this.stationReports=stationReports;
+      });
+      // return this._dataservice.getAllStationStatus();
     });
   }
 
@@ -49,7 +55,7 @@ export class AppComponent implements OnInit {
         visible: true
       });
       marker.addListener('click',function(){
-        this.createStatusWindow(this.station_id, this.marker,this.stationReports);
+        this.getStationStatusR(this.station_id, this.marker);
       });
     }
   }
@@ -66,26 +72,26 @@ export class AppComponent implements OnInit {
     var infowindow: any;
     // this._dataservice.getAllStationStatus()
     // .subscribe(stationReports => {
-    //   this.stationReports = stationReports
-    //   // this.createStatusWindow(station_id, marker, stationReports);
-    // });
-    let allStationStatus = stationReports['data']['stations'];
-    console.log(allStationStatus['station_id'])
-    //  for(var _j=0;_j < allStationStatus.length; _j++){
-      var statusPair = allStationStatus.filter(function (station) {
-        if (station['station_id'] == station_id) {
-          this.bikes_available = station['num_bikes_available'];
-          this.docks_available = station['num_docks_available'];
-        }
-      });
-      let contentString = '<div id="content">' + '<h3>Current Status</h3>' +
-      '<p>Bikes Available: ' + this.bikes_available + '</p>' + '<p>Docks Available: '
-      + this.docks_available + '</p>' + '</div>';
-      infowindow = new google.maps.InfoWindow({
-        content: contentString
-      });
-      // prev_infowindow = infowindow;
-      infowindow.open(myMap, marker);
-      //  }
+      //   this.stationReports = stationReports
+      //   // this.createStatusWindow(station_id, marker, stationReports);
+      // });
+      let allStationStatus = stationReports['data']['stations'];
+      console.log(allStationStatus['station_id'])
+      //  for(var _j=0;_j < allStationStatus.length; _j++){
+        var statusPair = allStationStatus.filter(function (station) {
+          if (station['station_id'] == station_id) {
+            this.bikes_available = station['num_bikes_available'];
+            this.docks_available = station['num_docks_available'];
+          }
+        });
+        let contentString = '<div id="content">' + '<h3>Current Status</h3>' +
+        '<p>Bikes Available: ' + this.bikes_available + '</p>' + '<p>Docks Available: '
+        + this.docks_available + '</p>' + '</div>';
+        infowindow = new google.maps.InfoWindow({
+          content: contentString
+        });
+        // prev_infowindow = infowindow;
+        infowindow.open(myMap, marker);
+        //  }
+      }
     }
-  }

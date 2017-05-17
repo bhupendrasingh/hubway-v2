@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { Station } from './station';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
+import {StationStatus} from './stationStatus';
 @Injectable()
 export class DataService {
     constructor(private _http: Http) {
@@ -13,7 +14,7 @@ export class DataService {
             map(this.extractdata).
             catch(this.handleError);
     }
-    getAllStationStatus(): Observable<any> {
+    getAllStationStatus():Observable<Station[]>{
         return this._http.get('https://gbfs.thehubway.com/gbfs/en/station_status.json').
             map((res:Response)=>res.json() || {}).
             catch(this.handleError);
